@@ -25,7 +25,7 @@ const agregar = async (req, res) => {
 
     // agregamos un nuevo objeto al array roommates en memoria con datos procesaados de la Api
     let ingreso = roommates.push(roommate);
-    
+
     // el array roommates debe ser pasado como objeto para conservar su estructura original
     fs.writeFileSync("roommates.json", JSON.stringify({ roommates }));
 
@@ -58,66 +58,77 @@ const gastos = async (req, res) => {
   }
 };
 
-const gasto = async (req, res) => {
-  // console.log('roommates, descripcion, monto : ',roommates, descripcion, monto);
+
+const gasto = async (roommate, descripcion, monto) => {
   try {
-    // return gastosJSON;
+    console.log("roommate", roommate);
+    console.log("descripcion", descripcion);
+    console.log("monto", monto);
     let id = uuidv4().slice(0, 6);
-    const gastos = { 
-      id: id, 
-      roommates: '', 
-      descripcion: '',
-       monto: '',
-     };
+    let gasto = {
+      id: id,
+      roommate: roommate,
+      descripcion: descripcion,
+      monto: monto,
+    };
+    console.log("gasto.roommate : ",gasto.roommate)
+    console.log("gasto.descripcion : ",gasto.descripcion)
+    console.log("gasto.monto : ",gasto.monto)
 
-     JSON.parse(fs.readFileSync("gastos.json", "utf8"));
+    const { gastos } = JSON.parse(fs.readFileSync("gastos.json", "utf8"));
+    let ingreso = gastos.push(gasto);
+    console.log('ingreso : ', ingreso);
 
-    let ingreso = gastos.push(gastos);
-    // Escribir el archivo JSON con la agregacion realizada
+    fs.writeFileSync("gastos.json", JSON.stringify({ gastos }));
 
-    fs.writeFileSync("gastos.json", JSON.stringify({gastos}));
-
-    console.log(`Nuevo gasto de ${roommates} creado con éxito`);
+    console.log(`Gastos creado con éxito`);
+    return gastos;
   } catch (error) {
-    console.log("error", error, error.message);
-    // res.send(  error.message );
-    // return res.status(500).send({ message: "Error interno del servidor: " + error.message });
+    console.error("Error al agregar gasto:", error);
   }
 };
-gasto();
 
-// const gastoNuevo = async (req, res) => {
-//   try {
-//     // Generar un ID único para el nuevo gasto
-//     const id = uuidv4().slice(0, 6);
+const gastoEditar = async (req, res) => {
+  try {
+    const { gastos }  = JSON.parse(fs.readFileSync("gastos.json", "utf8"));
+    console.log(gastos);
+    id = gastos[id];
+    console.log('id : ',id);
+
+    let gasto = {
+      id:id,
+      roommate: roommate,
+      descripcion: descripcion,
+      monto: monto,
+    };
+    console.log("gasto.roommate : ",gasto.roommate)
+    console.log("gasto.descripcion : ",gasto.descripcion)
+    console.log("gasto.monto : ",gasto.monto)
+
+    gasto = gastos.findIndex(gasto => gasto.id === gasto.id);
+    console.log('gastoUsuario : ', gastoUsuario);
+    if (indiceGasto !== -1) {
+      console.log(`El gasto con ID '${idBuscar}' se encuentra en el índice ${indiceGasto}`);
+    } else {
+      console.log(`No se encontró ningún gasto con ID '${idBuscar}'`);
+    }
     
-//     // Crear el objeto del nuevo gasto con los datos recibidos en la solicitud
-//     const nuevogasto = { 
-//       id: id, 
-//       roommates: req.body.roommates && '', 
-//       descripcion: req.body.descripcion && '', // Asegúrate de tener un valor por defecto si la descripción no está definida en la solicitud
-//       monto: req.body.monto && '', // Asegúrate de tener un valor por defecto si el monto no está definido en la solicitud
-//     };
+    gasto = gastoUsuario;
 
-//     // Leer el archivo JSON de gastos y almacenarlo en la variable gastos
-//     let gastos = JSON.parse(fs.readFileSync("gastos.json", "utf8"));
+    let ingreso = gastos.push(gasto);
+    console.log('ingreso : ', ingreso);
 
-//     // Agregar el nuevo gasto al array de gastos
-//     gastos.push(nuevogasto);
+    fs.writeFileSync("gastos.json", JSON.stringify({ gastos }));
 
-//     // Escribir todo el array de gastos en el archivo JSON
-//     fs.writeFileSync("gastos.json", JSON.stringify(gastos), "utf8");
+    console.log(`Gastos editados con éxito`);
+    return gastos;
 
-//     console.log(`Nuevo gasto de ${nuevogasto.roommates} creado con éxito`);
-
-//     // Enviar una respuesta al cliente indicando que el gasto se creó correctamente
-//     res.status(200).send({ message: `Nuevo gasto de ${nuevogasto} creado con éxito`, gasto: nuevogasto });
-//   } catch (error) {
-//     console.log("Error al crear el gasto:", error);
-//     res.status(500).send({ error: "Error interno del servidor al crear el gasto" });
-//   }
-// };
-// gastoNuevo("Juan", "Sal mineral", 50)
+  } catch (error) {
+    console.log("error", error, error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+// gastoEditar("ced75a","Adam","Articulos de limpieza","6666");
 
 
 
@@ -126,4 +137,5 @@ module.exports = {
   mostrarRoommates,
   gasto,
   gastos,
+  gastoEditar,
 };
